@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Statistics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: #111111;
+            border: 1px solid #1a1a1a;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #666666;
+            text-decoration: none;
+            margin-bottom: 32px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 40px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .input-section {
+            background: #0a0a0a;
+            padding: 24px;
+            border: 1px solid #1a1a1a;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 12px;
+            color: #999999;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 14px 16px;
+            background: #111111;
+            border: 1px solid #2a2a2a;
+            color: #ffffff;
+            font-size: 14px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #ffffff;
+            background: #161616;
+        }
+
+        .url-input::placeholder {
+            color: #555555;
+        }
+
+        .check-btn {
+            padding: 14px 32px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .check-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .check-btn:active {
+            transform: scale(0.98);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 80px 0;
+            color: #666666;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #1a0000;
+            color: #ff4444;
+            padding: 16px;
+            border: 1px solid #330000;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: #0a0a0a;
+            padding: 32px 24px;
+            border: 1px solid #1a1a1a;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: #2a2a2a;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            color: #666666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .url-info {
+            background: #0a0a0a;
+            padding: 32px;
+            border: 1px solid #1a1a1a;
+            margin-bottom: 32px;
+        }
+
+        .url-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .url-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .url-label {
+            font-weight: 500;
+            color: #666666;
+            min-width: 120px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .url-value {
+            flex: 1;
+            padding: 14px 16px;
+            background: #111111;
+            border: 1px solid #2a2a2a;
+            color: #ffffff;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            padding: 14px 24px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #2a2a2a;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #2a2a2a;
+            border-color: #3a3a3a;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .copy-btn.copied {
+            background: #0a0a0a;
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 40px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+        }
+
+        .qr-section h3 {
+            margin-bottom: 24px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .qr-code {
+            display: inline-block;
+            padding: 16px;
+            background: #ffffff;
+            line-height: 0;
+        }
+
+        .time-value {
+            flex: 1;
+            padding: 14px 16px;
+            background: #111111;
+            border: 1px solid #2a2a2a;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .check-btn {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stat-card {
+                padding: 24px 16px;
+            }
+
+            .stat-number {
+                font-size: 36px;
+            }
+
+            .url-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .url-label {
+                margin-bottom: 8px;
+                min-width: unset;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
+
+            .url-info {
+                padding: 24px;
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #333333;
+            border-radius: 50%;
+            border-top-color: #666666;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .stats-content {
+            display: none;
+        }
+
+        .stats-content.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">
+            ← Back to shortener
+        </a>
+
+        <h1>Link Statistics</h1>
+
+        <div class="input-section">
+            <label class="input-label" for="urlInput">Enter short URL or code</label>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="urlInput" 
+                    class="url-input" 
+                    placeholder="http://localhost:8080/abc123 or just abc123"
+                    value=""
+                >
+                <button class="check-btn" onclick="checkStats()">Check Stats</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <div style="margin-top: 16px;">Loading statistics...</div>
+        </div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="statsContent" class="stats-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="clickCount">0</div>
+                    <div class="stat-label">Total Clicks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="daysSince">0</div>
+                    <div class="stat-label">Days Active</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgClicks">0</div>
+                    <div class="stat-label">Clicks per Day</div>
+                </div>
+            </div>
+
+            <div class="url-info">
+                <div class="url-row">
+                    <span class="url-label">Short URL</span>
+                    <input type="text" class="url-value" id="shortUrl" readonly>
+                    <button class="copy-btn" onclick="copyUrl('shortUrl', this)">Copy</button>
+                </div>
+                <div class="url-row">
+                    <span class="url-label">Original URL</span>
+                    <input type="text" class="url-value" id="originalUrl" readonly>
+                    <button class="copy-btn" onclick="copyUrl('originalUrl', this)">Copy</button>
+                </div>
+                <div class="url-row">
+                    <span class="url-label">Created</span>
+                    <div class="time-value" id="createdAt"></div>
+                </div>
+            </div>
+
+            <div class="qr-section">
+                <h3>QR Code</h3>
+                <div class="qr-code">
+                    <img id="qrCode" alt="QR Code" width="200" height="200">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if there's a code in the URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeParam = urlParams.get('code');
+        
+        if (codeParam) {
+            document.getElementById('urlInput').value = codeParam;
+            checkStats();
+        }
+
+        function extractShortCode(input) {
+            // Remove whitespace
+            input = input.trim();
+            
+            // If it's already just a code, return it
+            if (!input.includes('/')) {
+                return input;
+            }
+            
+            // Extract code from full URL
+            const parts = input.split('/');
+            return parts[parts.length - 1];
+        }
+
+        async function checkStats() {
+            const input = document.getElementById('urlInput').value;
+            if (!input) {
+                showError('Please enter a short URL or code');
+                return;
+            }
+
+            const shortCode = extractShortCode(input);
+            if (!shortCode) {
+                showError('Invalid short URL or code');
+                return;
+            }
+
+            // Update URL without reloading
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('code', shortCode);
+            window.history.pushState({}, '', newUrl);
+
+            await loadStats(shortCode);
+        }
+
+        async function loadStats(shortCode) {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const statsContent = document.getElementById('statsContent');
+
+            // Reset states
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            statsContent.classList.remove('show');
+
+            try {
+                const response = await fetch(`/api/stats/${shortCode}`);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Short link not found');
+                    }
+                    throw new Error('Failed to load statistics');
+                }
+
+                const data = await response.json();
+                displayStats(data);
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayStats(data) {
+            // Show content
+            document.getElementById('statsContent').classList.add('show');
+
+            // Update stats
+            document.getElementById('clickCount').textContent = data.click_count || 0;
+            
+            // Calculate days since creation
+            const created = new Date(data.created_at);
+            const now = new Date();
+            const daysSince = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+            document.getElementById('daysSince').textContent = daysSince;
+
+            // Calculate average clicks per day
+            const clickCount = data.click_count || 0;
+            const avgClicks = daysSince > 0 ? (clickCount / daysSince).toFixed(1) : clickCount;
+            document.getElementById('avgClicks').textContent = avgClicks;
+
+            // Update URLs
+            document.getElementById('shortUrl').value = data.short_url;
+            document.getElementById('originalUrl').value = data.original_url;
+
+            // Format date
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('createdAt').textContent = created.toLocaleDateString('en-US', options);
+
+            // Generate QR code
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.short_url)}`;
+            document.getElementById('qrCode').src = qrApiUrl;
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = message;
+            document.getElementById('statsContent').classList.remove('show');
+        }
+
+        function copyUrl(elementId, button) {
+            const input = document.getElementById(elementId);
+            input.select();
+            input.setSelectionRange(0, 99999);
+            
+            navigator.clipboard.writeText(input.value).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Allow Enter key to check stats
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkStats();
+            }
+        });
+    </script>
+</body>
+</html>
