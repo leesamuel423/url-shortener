@@ -4,12 +4,12 @@ import (
 	"log"
 	"net/http"
 
-	_ "github.com/lib/pq"
 	"github.com/leesamuel423/url-shortener/internal/config"
 	"github.com/leesamuel423/url-shortener/internal/database"
 	"github.com/leesamuel423/url-shortener/internal/handlers"
 	"github.com/leesamuel423/url-shortener/internal/repository"
 	"github.com/leesamuel423/url-shortener/internal/service"
+	_ "github.com/lib/pq"
 )
 
 func main() {
