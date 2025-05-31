@@ -1,9 +1,15 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
+	_ "github.com/lib/pq"
 	"github.com/leesamuel423/url-shortener/internal/config"
 	"github.com/leesamuel423/url-shortener/internal/database"
-	"log"
+	"github.com/leesamuel423/url-shortener/internal/handlers"
+	"github.com/leesamuel423/url-shortener/internal/repository"
+	"github.com/leesamuel423/url-shortener/internal/service"
 )
 
 func main() {
@@ -25,4 +31,14 @@ func main() {
 		log.Fatal("Failed to run migration:", err)
 	}
 
+	urlRepo := repository.NewPostgresURLRepository(db)
+	urlService := service.NewURLService(urlRepo, cfg)
+	handler := handlers.NewHandler(urlService, cfg)
+
+	// Setup routes
+	router := handler.SetupRoutes()
+
+	// Start server
+	log.Printf("Server starting on port %s", cfg.Port)
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, router))
 }
