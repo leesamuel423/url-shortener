@@ -14,7 +14,7 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	_ = godotenv.Load
+	_ = godotenv.Load()
 
 	cfg := &Config{
 		DatabaseURL: getEnv("DATABASE_URL", "postgres://postgres:password@localhost/urlshortener?sslmode=disable"),
