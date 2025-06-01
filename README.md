@@ -2,6 +2,7 @@
 
 URL shortening service built with Go. Allows users to create short URLs, track click statistics, and manage custom short codes.
 
+![demo](./demo.gif)
 
 ## Prerequisites
 
